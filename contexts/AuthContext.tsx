@@ -10,9 +10,10 @@ export type User = {
   email: string;
 };
 
+//define type for context
 type AuthContextType = {
   user: User | null;
-  setUser: (user: User | null) => void;  // expose setter to update user externally
+  setUser: (user: User | null) => void;
   login: (user: User, token: string) => void;
   logout: () => void;
 };
@@ -24,19 +25,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
 
+  // login function to set user and token, can also be used in cookie based auth
   const login = (user: User, token: string) => {
     setUser(user);
     localStorage.setItem("token", token);
     console.log(token);
   };
 
+  // logout function to clear user and token, can also be used in cookie based auth
   const logout = () => {
     setUser(null);
     localStorage.removeItem("token");
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   return (
+    // pass the value to the context to use in other components
     <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>

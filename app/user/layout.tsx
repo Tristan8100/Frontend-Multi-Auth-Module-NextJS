@@ -4,11 +4,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
+import { LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
-    const { user, setUser } = useAuth();
+    const { user, setUser, logout } = useAuth();
+    const pathname = usePathname();
 
+    // On mount, verify token and fetch user info, diy middleware for every refresh
     useEffect(() => {
     const token = localStorage.getItem("token");
     
@@ -34,7 +41,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     };
 
     verifyUser();
-  }, [router, setUser]);
+  }, [pathname]);// Added pathname to re-verify on route change
 
   // Por debugging
   useEffect(() => {
@@ -46,11 +53,27 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     return null;
   }
   return (
-    <div className="flex h-full min-h-screen flex-col">
-      <header className="flex h-16 shrink-0 items-center justify-center bg-primary text-primary-foreground">
-        <h1 className="text-2xl font-bold">User Dashboard</h1>
+    <div className="flex min-h-screen flex-col bg-muted/20">
+      {/* Header */}
+      <header className="flex h-16 items-center justify-between px-6 bg-primary text-primary-foreground shadow-md">
+        <h1 className="text-2xl font-semibold tracking-tight">User Dashboard</h1>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={logout}
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </Button>
       </header>
-      <main className="flex-1 overflow-y-auto">{children}</main>
+
+      <Separator />
+
+      {/* Main Content */}
+      <main className="flex-1 p-6 overflow-y-auto">
+        <Card className="p-6 shadow-sm bg-background">{children}</Card>
+      </main>
     </div>
   );
 }

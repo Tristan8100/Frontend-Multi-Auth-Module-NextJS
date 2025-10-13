@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
-  const { login } = useAuth();
+  const { login } = useAuth(); // for saving user and token
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -44,17 +44,32 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       api.post("/api/login", credentials).then((res) => res.data),
     onSuccess: (data) => {
       if (data.token) {
-        login(data.user_info, data.token);
+        login(data.user_info, data.token); // Set user and token in useAuth
         router.push("/user/dashboard");
         console.log("User login successful");
       }
     },
     onError: (err: any) => {
       console.warn("User login failed, attempting admin login...");
-      attemptAdminLogin({ email, password });
+
+      const status = err.response?.status;
+      //const message = err.response?.data?.message;
+      if (status === 401) {
+        attemptAdminLogin({ email, password });
+      } else if (status === 403) {
+        api.post("/api/send-otp", { email })
+          .then((otpRes) => {
+            localStorage.setItem("email", email);
+            router.push("/auth/verify-otp");
+          })
+          .catch(() => {
+            setError("Failed to send OTP. Please try again later.");
+          });
+      }
     },
   });
 
+  // handle form submission, will call the mutation of user login
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
