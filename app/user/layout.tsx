@@ -31,7 +31,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         });
         
         setUser(res.data.user_info);
-        console.log("User set:", res.data.user_info); // por debugging again
+        console.log("User set:", res.data.user_info); // for debugging again
       } catch (error) {
         console.error("Verification failed:", error);
         localStorage.removeItem("token");
@@ -43,7 +43,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     verifyUser();
   }, [pathname]);// Added pathname to re-verify on route change
 
-  // Por debugging
+  // for debugging
   useEffect(() => {
     console.log("User state updated:", user);
   }, [user]);
