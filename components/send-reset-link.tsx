@@ -30,7 +30,7 @@ export function SendResetLinkForm({
       api.post('/api/forgot-password', credentials).then(res => res.data),
     onSuccess: (data) => {
       console.log('Reset link sent successfully:', data);
-      localStorage.setItem('verificationEmail', email); // Store email for OTP verification
+      localStorage.setItem('email', email); // Store email for OTP verification
       router.push('/forgot-password/verify-otp');
     },
     onError: (error: any) => {
